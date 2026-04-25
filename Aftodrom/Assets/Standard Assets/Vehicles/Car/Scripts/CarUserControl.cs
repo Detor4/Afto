@@ -23,15 +23,16 @@ namespace UnityStandardAssets.Vehicles.Car
         {
             // pass the input to the car!
             float h = InputHandler.Horizontal;
-            float v = InputHandler.Vertical;
-
+            float accel = InputHandler.Accel;
+            float brake = InputHandler.Brake;
 
 #if !MOBILE_INPUT
             float handbrake = CrossPlatformInputManager.GetAxis("Jump");
-            m_Car.Move(h, v, v, handbrake);
+            m_Car.Move(h, accel, -brake, handbrake);
 #else
-            m_Car.Move(h, v, v, 0f);
+            m_Car.Move(h, accel, -brake, 0f);
 #endif
         }
+
     }
 }

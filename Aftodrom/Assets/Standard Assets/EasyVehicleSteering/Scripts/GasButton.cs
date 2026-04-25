@@ -4,9 +4,12 @@ using UnityEngine.EventSystems;
 
 namespace EasyVehicleSteering
 {
+	public enum InputType { Accel, Brake }
+
 	public class GasButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 	{
-		public float accelerationValue = 1f; // 1 for Gas, -1 for Brake
+		public InputType type = InputType.Accel;
+		public float value = 1f;
 		private bool isHeld = false;
 
 		public void OnPointerDown(PointerEventData eventData)
@@ -17,21 +20,33 @@ namespace EasyVehicleSteering
 		public void OnPointerUp(PointerEventData eventData)
 		{
 			isHeld = false;
-			InputHandler.ClearSimulatedVertical();
+			ClearInput();
 		}
 
 		void Update()
 		{
 			if (isHeld)
 			{
-				InputHandler.SetSimulatedVertical(accelerationValue);
+				if (type == InputType.Accel)
+					InputHandler.SetSimulatedAccel(value);
+				else
+					InputHandler.SetSimulatedBrake(value);
 			}
+		}
+
+		void ClearInput()
+		{
+			if (type == InputType.Accel)
+				InputHandler.ClearSimulatedAccel();
+			else
+				InputHandler.ClearSimulatedBrake();
 		}
 
 		void OnDisable()
 		{
 			isHeld = false;
-			InputHandler.ClearSimulatedVertical();
+			ClearInput();
 		}
 	}
 }
+
