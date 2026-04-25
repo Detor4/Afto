@@ -14,7 +14,10 @@ namespace EasyVehicleSteering
 		private static bool useSimulatedBrake = false;
 		private static float simulatedBrake = 0f;
 
+		public static bool IsReverseGear = false;
+
 		public static void SetSimulatedHorizontal(float value)
+
 		{
 			simulatedHorizontal = Mathf.Clamp(value, -1f, 1f);
 			useSimulatedHorizontal = true;

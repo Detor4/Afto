@@ -55,6 +55,8 @@ namespace UnityStandardAssets.Vehicles.Car
         public float MaxSpeed{get { return m_Topspeed; }}
         public float Revs { get; private set; }
         public float AccelInput { get; private set; }
+        public bool IsReverse { get; set; }
+
 
         // Use this for initialization
         private void Start()
@@ -196,49 +198,48 @@ namespace UnityStandardAssets.Vehicles.Car
 
         private void ApplyDrive(float accel, float footbrake)
         {
-
             float thrustTorque;
-            switch (m_CarDriveType)
+            if (IsReverse)
             {
-                case CarDriveType.FourWheelDrive:
-                    thrustTorque = accel * (m_CurrentTorque / 4f);
-                    for (int i = 0; i < 4; i++)
-                    {
-                        m_WheelColliders[i].motorTorque = thrustTorque;
-                    }
-                    break;
-
-                case CarDriveType.FrontWheelDrive:
-                    thrustTorque = accel * (m_CurrentTorque / 2f);
-                    m_WheelColliders[0].motorTorque = m_WheelColliders[1].motorTorque = thrustTorque;
-                    break;
-
-                case CarDriveType.RearWheelDrive:
-                    thrustTorque = accel * (m_CurrentTorque / 2f);
-                    m_WheelColliders[2].motorTorque = m_WheelColliders[3].motorTorque = thrustTorque;
-                    break;
-
+                thrustTorque = accel * (-m_ReverseTorque / 4f); // Reverse torque
+            }
+            else
+            {
+                thrustTorque = accel * (m_CurrentTorque / 4f); // Forward torque
             }
 
             for (int i = 0; i < 4; i++)
             {
-                if (CurrentSpeed > 5 && Vector3.Angle(transform.forward, m_Rigidbody.velocity) < 50f)
+                // Apply motor torque
+                if (m_CarDriveType == CarDriveType.FourWheelDrive)
                 {
-                    m_WheelColliders[i].brakeTorque = m_BrakeTorque*footbrake;
+                    m_WheelColliders[i].motorTorque = thrustTorque;
                 }
-                else if (footbrake > 0)
+                else if (m_CarDriveType == CarDriveType.FrontWheelDrive && i < 2)
                 {
-                    m_WheelColliders[i].brakeTorque = m_BrakeTorque*footbrake;
+                    m_WheelColliders[i].motorTorque = thrustTorque * 2f;
+                }
+                else if (m_CarDriveType == CarDriveType.RearWheelDrive && i >= 2)
+                {
+                    m_WheelColliders[i].motorTorque = thrustTorque * 2f;
+                }
+                else
+                {
                     m_WheelColliders[i].motorTorque = 0f;
+                }
+
+                // Apply brake torque
+                if (footbrake > 0)
+                {
+                    m_WheelColliders[i].brakeTorque = m_BrakeTorque * footbrake;
                 }
                 else
                 {
                     m_WheelColliders[i].brakeTorque = 0f;
                 }
-
-
             }
         }
+
 
 
         private void SteerHelper()

@@ -26,6 +26,8 @@ namespace UnityStandardAssets.Vehicles.Car
             float accel = InputHandler.Accel;
             float brake = InputHandler.Brake;
 
+            m_Car.IsReverse = InputHandler.IsReverseGear;
+
 #if !MOBILE_INPUT
             float handbrake = CrossPlatformInputManager.GetAxis("Jump");
             m_Car.Move(h, accel, -brake, handbrake);
@@ -33,6 +35,7 @@ namespace UnityStandardAssets.Vehicles.Car
             m_Car.Move(h, accel, -brake, 0f);
 #endif
         }
+
 
     }
 }
